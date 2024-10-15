@@ -1,6 +1,6 @@
 import pytest
 
-from src.practicau2_1 import (
+from src.practica_u2_1 import (
     comprobar_importe, comprobar_comando, procesar_compra, procesar_venta,
     mostrar_saldo, resetear_saldo, recuperar_comando_e_importe, mostrar_mensaje_error
 )
@@ -21,7 +21,7 @@ def test_comprobar_importe(valor, expected):
     Prueba para la función comprobar_importe.
     """
     assert comprobar_importe(valor) == expected
-
+    
 
 @pytest.mark.parametrize(
     "comando, expected",
@@ -42,33 +42,33 @@ def test_comprobar_comando(comando, expected):
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, expected",
+    "saldo, importe, cont_compras, expected",
     [
-        (100.0, 50.0, 50.0),
-        (200.0, 100.0, 100.0),
-        (0.0, 50.0, -50.0),
+        (100.0, 50.0, 0, (50.0, 1)),
+        (200.0, 100.0, 1, (100.0, 2)),
+        (0.0, 50.0, 2, (-50.0, 3)),
     ]
 )
-def test_procesar_compra(saldo, importe, expected):
+def test_procesar_compra(saldo, importe, cont_compras, expected):
     """
     Prueba para la función procesar_compra.
     """
-    assert procesar_compra(saldo, importe) == expected
+    assert procesar_compra(saldo, importe, cont_compras) == expected
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, expected",
+    "saldo, importe, cont_ventas, expected",
     [
-        (100.0, 50.0, 150.0),
-        (200.0, 100.0, 300.0),
-        (0.0, 50.0, 50.0),
+        (100.0, 50.0, 0, (150.0, 1)),
+        (200.0, 100.0, 1, (300.0, 2)),
+        (0.0, 50.0, 2, (50.0, 3)),
     ]
 )
-def test_procesar_venta(saldo, importe, expected):
+def test_procesar_venta(saldo, importe, cont_ventas, expected):
     """
     Prueba para la función procesar_venta.
     """
-    assert procesar_venta(saldo, importe) == expected
+    assert procesar_venta(saldo, importe, cont_ventas) == expected
 
 
 @pytest.mark.parametrize(
