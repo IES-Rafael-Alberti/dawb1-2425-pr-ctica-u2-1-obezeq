@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-COMANDOS = ["compra", "venta", "saldo", "reset", "fin"]
+COMANDOS = ["compra", "venta", "saldo", "reset", "fin", "deshacer"]
 MENSAJE_ERROR = "*ERROR* Entrada inválida"
 
 def comprobar_importe(valor: str) -> bool:
@@ -53,7 +53,7 @@ def mostrar_mensaje_error():
     print("*ERROR* Entrada inválida")
 
 
-def procesar_compra(saldo: float, importe: float, cont_compras: int) -> tuple[float, int]:
+def procesar_compra(saldo: float, importe: float, cont_compras: int, cont_ventas: int) -> tuple[float, int, tuple[float, int, int]]:
     """
     Procesa una operación de compra y actualiza el saldo restando el importe.
 
@@ -64,13 +64,14 @@ def procesar_compra(saldo: float, importe: float, cont_compras: int) -> tuple[fl
     Returns:
         float: El saldo actualizado después de realizar la compra.
     """
+    ultima_operacion = (saldo, cont_compras, cont_ventas)
     importe = float(importe)
     saldo -= importe
     cont_compras += 1
-    return saldo, cont_compras
+    return (saldo, cont_compras, ultima_operacion)
 
 
-def procesar_venta(saldo: float, importe: float, cont_ventas: int) -> tuple[float, int]:
+def procesar_venta(saldo: float, importe: float, cont_compras: int, cont_ventas: int) -> tuple[float, int, tuple[float, int, int]]:
     """
     Procesa una operación de venta y actualiza el saldo sumando el importe.
 
@@ -81,10 +82,11 @@ def procesar_venta(saldo: float, importe: float, cont_ventas: int) -> tuple[floa
     Returns:
         float: El saldo actualizado después de realizar la venta.
     """
+    ultima_operacion = (saldo, cont_compras, cont_ventas)
     importe = float(importe)
     saldo += importe
     cont_ventas += 1
-    return (saldo, cont_ventas)
+    return (saldo, cont_ventas, ultima_operacion)
 
 
 def mostrar_saldo(saldo: float, cont_compras: int, cont_ventas: int):
@@ -144,6 +146,11 @@ def recuperar_comando_e_importe(linea: str) -> tuple[str, str]:
     else:
         return None, None
 
+def deshacer_operacion(ultima_operacion: list) -> tuple[float, int, int]:
+    """Función para deshacer la ultima operacion, retornando la ultima operacion (saldo, cont_compras, cont_ventas)"""
+    print("Última operación deshecha.")
+    return ultima_operacion
+
 def main():
     """
     Función principal que gestiona el flujo del programa. El programa permite al usuario realizar
@@ -183,6 +190,7 @@ def main():
     cont_ventas = 0
     saldo = 0
     encuentra_fin = False
+    ultima_operacion = (0.0, 0 ,0)
 
     while not encuentra_fin:
         linea = input("> ")
@@ -190,21 +198,23 @@ def main():
 
         if comando is None or not comprobar_comando(comando):
             mostrar_mensaje_error()
-        elif comando in ("saldo", "reset", "fin") and importe is not None:
+        elif comando in ("saldo", "reset", "fin", "deshacer") and importe is not None:
             mostrar_mensaje_error()
         elif comando == "saldo":
             mostrar_saldo(saldo, cont_compras, cont_ventas)
         elif comando == "reset":
             saldo, cont_compras, cont_ventas = resetear_saldo(saldo, cont_compras, cont_ventas)
+        elif comando == "deshacer":
+            saldo, cont_compras, cont_ventas = deshacer_operacion(ultima_operacion)
         elif comando == "fin":
             encuentra_fin = True
         elif importe is None or not comprobar_importe(importe):
             mostrar_mensaje_error()
         else:
             if comando == "compra":
-                saldo, cont_compras = procesar_compra(saldo, importe, cont_compras)
+                saldo, cont_compras, ultima_operacion = procesar_compra(saldo, importe, cont_compras, cont_ventas)
             elif comando == "venta":
-                saldo, cont_ventas = procesar_venta(saldo, importe, cont_ventas)
+                saldo, cont_ventas, ultima_operacion = procesar_venta(saldo, importe, cont_compras, cont_ventas)
 
             
 if __name__ == "__main__":

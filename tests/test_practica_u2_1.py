@@ -42,33 +42,33 @@ def test_comprobar_comando(comando, expected):
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, cont_compras, expected",
+    "saldo, importe, cont_compras, cont_ventas, expected",
     [
-        (100.0, 50.0, 0, (50.0, 1)),
-        (200.0, 100.0, 1, (100.0, 2)),
-        (0.0, 50.0, 2, (-50.0, 3)),
+        (100.0, 50.0, 0, 0, (50.0, 1, (100.0, 0, 0))),
+        (200.0, 100.0, 1, 1, (100.0, 2, (200.0, 1, 1))),
+        (0.0, 50.0, 2, 2, (-50.0, 3, (0.0, 2, 2))),
     ]
 )
-def test_procesar_compra(saldo, importe, cont_compras, expected):
+def test_procesar_compra(saldo, importe, cont_compras, cont_ventas, expected):
     """
     Prueba para la función procesar_compra.
     """
-    assert procesar_compra(saldo, importe, cont_compras) == expected
+    assert procesar_compra(saldo, importe, cont_compras, cont_ventas) == expected
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, cont_ventas, expected",
+    "saldo, importe, cont_compras, cont_ventas, expected",
     [
-        (100.0, 50.0, 0, (150.0, 1)),
-        (200.0, 100.0, 1, (300.0, 2)),
-        (0.0, 50.0, 2, (50.0, 3)),
+        (100.0, 50.0, 0, 0, (150.0, 1, (100.0, 0, 0))),
+        (200.0, 100.0, 1, 1, (300.0, 2, (200.0, 1, 1))),
+        (0.0, 50.0, 2, 2, (50.0, 3, (0.0, 2, 2))),
     ]
 )
-def test_procesar_venta(saldo, importe, cont_ventas, expected):
+def test_procesar_venta(saldo, importe, cont_compras, cont_ventas, expected):
     """
     Prueba para la función procesar_venta.
     """
-    assert procesar_venta(saldo, importe, cont_ventas) == expected
+    assert procesar_venta(saldo, importe, cont_compras, cont_ventas) == expected
 
 
 @pytest.mark.parametrize(
