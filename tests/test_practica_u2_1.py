@@ -2,7 +2,7 @@ import pytest
 
 from src.practica_u2_1 import (
     comprobar_importe, comprobar_comando, procesar_compra, procesar_venta,
-    mostrar_saldo, resetear_saldo, recuperar_comando_e_importe, mostrar_mensaje_error
+    mostrar_saldo, resetear_saldo, recuperar_comando_e_importe, mostrar_mensaje_error, deshacer_operacion
 )
 
 @pytest.mark.parametrize(
@@ -106,6 +106,25 @@ def test_resetear_saldo(capsys, saldo, cont_compras, cont_ventas, expected_saldo
     assert result_saldo == expected_saldo
     assert result_compras == expected_compras
     assert result_ventas == expected_ventas
+
+
+@pytest.mark.parametrize(
+        "ultima_operacion, expected_operacion, expected_output",
+        [
+            ((0.0, 0, 0), (0.0, 0, 0), "Última operación deshecha.\n"),
+            ((100.0, 0, 0), (100.0, 0, 0), "Última operación deshecha.\n"),
+            ((-100.0, 0, 0), (-100.0, 0, 0), "Última operación deshecha.\n"),
+        ]
+)
+def test_deshacer_operacion(capsys, ultima_operacion, expected_operacion, expected_output):
+    """
+    Prueba para deshacer la operación y actualizar saldo, count_compras, count_ventas con el saldo antiguo.
+    """
+    result_ultima_operacion = deshacer_operacion(ultima_operacion)
+    captured = capsys.readouterr()
+
+    assert captured.out == expected_output
+    assert result_ultima_operacion == expected_operacion
 
 
 @pytest.mark.parametrize(

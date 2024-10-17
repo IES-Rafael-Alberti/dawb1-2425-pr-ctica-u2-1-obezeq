@@ -146,7 +146,7 @@ def recuperar_comando_e_importe(linea: str) -> tuple[str, str]:
     else:
         return None, None
 
-def deshacer_operacion(ultima_operacion: list) -> tuple[float, int, int]:
+def deshacer_operacion(ultima_operacion: tuple) -> tuple[float, int, int]:
     """Función para deshacer la ultima operacion, retornando la ultima operacion (saldo, cont_compras, cont_ventas)"""
     print("Última operación deshecha.")
     return ultima_operacion
