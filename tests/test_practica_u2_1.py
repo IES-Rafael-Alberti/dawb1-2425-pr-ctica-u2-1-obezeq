@@ -1,8 +1,8 @@
 import pytest
 
-from src.practicau2_1 import (
+from src.practica_u2_1 import (
     comprobar_importe, comprobar_comando, procesar_compra, procesar_venta,
-    mostrar_saldo, resetear_saldo, recuperar_comando_e_importe, mostrar_mensaje_error
+    mostrar_saldo, resetear_saldo, recuperar_comando_e_importe, mostrar_mensaje_error, deshacer_operacion
 )
 
 @pytest.mark.parametrize(
@@ -21,7 +21,7 @@ def test_comprobar_importe(valor, expected):
     Prueba para la función comprobar_importe.
     """
     assert comprobar_importe(valor) == expected
-
+    
 
 @pytest.mark.parametrize(
     "comando, expected",
@@ -42,33 +42,33 @@ def test_comprobar_comando(comando, expected):
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, expected",
+    "saldo, importe, cont_compras, cont_ventas, expected",
     [
-        (100.0, 50.0, 50.0),
-        (200.0, 100.0, 100.0),
-        (0.0, 50.0, -50.0),
+        (100.0, 50.0, 0, 0, (50.0, 1, (100.0, 0, 0))),
+        (200.0, 100.0, 1, 1, (100.0, 2, (200.0, 1, 1))),
+        (0.0, 50.0, 2, 2, (-50.0, 3, (0.0, 2, 2))),
     ]
 )
-def test_procesar_compra(saldo, importe, expected):
+def test_procesar_compra(saldo, importe, cont_compras, cont_ventas, expected):
     """
     Prueba para la función procesar_compra.
     """
-    assert procesar_compra(saldo, importe) == expected
+    assert procesar_compra(saldo, importe, cont_compras, cont_ventas) == expected
 
 
 @pytest.mark.parametrize(
-    "saldo, importe, expected",
+    "saldo, importe, cont_compras, cont_ventas, expected",
     [
-        (100.0, 50.0, 150.0),
-        (200.0, 100.0, 300.0),
-        (0.0, 50.0, 50.0),
+        (100.0, 50.0, 0, 0, (150.0, 1, (100.0, 0, 0))),
+        (200.0, 100.0, 1, 1, (300.0, 2, (200.0, 1, 1))),
+        (0.0, 50.0, 2, 2, (50.0, 3, (0.0, 2, 2))),
     ]
 )
-def test_procesar_venta(saldo, importe, expected):
+def test_procesar_venta(saldo, importe, cont_compras, cont_ventas, expected):
     """
     Prueba para la función procesar_venta.
     """
-    assert procesar_venta(saldo, importe) == expected
+    assert procesar_venta(saldo, importe, cont_compras, cont_ventas) == expected
 
 
 @pytest.mark.parametrize(
@@ -106,6 +106,25 @@ def test_resetear_saldo(capsys, saldo, cont_compras, cont_ventas, expected_saldo
     assert result_saldo == expected_saldo
     assert result_compras == expected_compras
     assert result_ventas == expected_ventas
+
+
+@pytest.mark.parametrize(
+        "ultima_operacion, expected_operacion, expected_output",
+        [
+            ((0.0, 0, 0), (0.0, 0, 0), "Última operación deshecha.\n"),
+            ((100.0, 0, 0), (100.0, 0, 0), "Última operación deshecha.\n"),
+            ((-100.0, 0, 0), (-100.0, 0, 0), "Última operación deshecha.\n"),
+        ]
+)
+def test_deshacer_operacion(capsys, ultima_operacion, expected_operacion, expected_output):
+    """
+    Prueba para deshacer la operación y actualizar saldo, count_compras, count_ventas con el saldo antiguo.
+    """
+    result_ultima_operacion = deshacer_operacion(ultima_operacion)
+    captured = capsys.readouterr()
+
+    assert captured.out == expected_output
+    assert result_ultima_operacion == expected_operacion
 
 
 @pytest.mark.parametrize(
